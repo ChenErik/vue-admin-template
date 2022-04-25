@@ -1,0 +1,1 @@
+import{_ as r}from"./index.efae4e0b.js";import"./vendor.20b7c57b.js";const e={};function t(o,_){return" Sorry,\u4F60\u6CA1\u6709\u6B64\u9875\u9762\u7684\u8BBF\u95EE\u6743\u9650\u3002 "}var n=r(e,[["render",t]]);export{n as default};

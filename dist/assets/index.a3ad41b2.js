@@ -1,0 +1,1 @@
+import{_ as t}from"./index.efae4e0b.js";import{b as o,t as r,o as s}from"./vendor.20b7c57b.js";const a={},c={class:"dashboard",style:{resize:"both"}};function n(e,i){return s(),o("div",c,r(e.$route.meta.title),1)}var l=t(a,[["render",n]]);export{l as default};
