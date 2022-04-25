@@ -1,0 +1,47 @@
+{
+  "name": "hmi-manager",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "acp-core": "^1.6.8",
+    "element-plus": "^2.1.4",
+    "nprogress": "^0.2.0",
+    "path-browserify": "^1.0.1",
+    "path-to-regexp": "^6.2.0",
+    "pinia": "^2.0.12",
+    "prj-confs": "^1.1.3",
+    "vue": "^3.2.31",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "@vitejs/plugin-vue": "^2.2.4",
+    "@vue/compiler-sfc": "^3.2.31",
+    "eslint": "^8.12.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-vue": "^8.5.0",
+    "jquery": "^3.6.0",
+    "sass": "^1.49.9",
+    "typescript": "^4.6.2",
+    "unplugin-vue-components": "^0.18.0",
+    "vite": "^2.8.6",
+    "vite-plugin-svg-icons": "^2.0.1",
+    "vite-plugin-vue-setup-extend": "^0.4.0",
+    "vue-tsc": "^0.33.2-patch.1"
+  },
+  "license": "MIT",
+  "lint-staged": {
+    "src/**/*.{js,ts,vue}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
