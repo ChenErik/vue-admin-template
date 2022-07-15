@@ -1,50 +1,51 @@
-<template>
-    <el-container :class="classObj">
-        <el-aside class="sidebar-container has-logo">
-            <Sidebar />
-        </el-aside>
-      <el-container>
-        <el-header class="fixed-header">
-            <div class="navbar">
-                <Header />
-            </div>
-          <TagsView />
-        </el-header>
-        <el-scrollbar>
-            <el-main class="container">
-                    <router-view>
-                        <template #default="{ Component, route }">
-                            <transition name="fade-slide" mode="out-in" appear>
-                                <keep-alive :include="cachedViews">
-                                    <component :is="Component" :key="route.fullPath" />
-                                </keep-alive>
-                            </transition>
-                        </template>
-                    </router-view>
-            </el-main>
-        </el-scrollbar>
-      </el-container>
-    </el-container>
-</template>
-
 <script setup lang="ts">
+import { computed } from 'vue'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar/index.vue'
 import TagsView from './components/TagsView/index.vue'
-import { computed } from 'vue'
 import { useAppStore } from '@/store/app'
 import { useTagsViewStore } from '@/store/tagsView'
 const tagsViewStore = useTagsViewStore()
-const cachedViews = computed(()=> tagsViewStore.getCachedTabList)
+const cachedViews = computed(() => tagsViewStore.getCachedTabList)
 const appStore = useAppStore()
-const classObj = computed(()=>({
-    hideSidebar: !appStore.sidebar.opened,
-    openSidebar: appStore.sidebar.opened,
+const classObj = computed(() => ({
+  hideSidebar: !appStore.sidebar.opened,
+  openSidebar: appStore.sidebar.opened,
 }))
 window.onresize = () => {
-    appStore.setViewHeight()
+  appStore.setViewHeight()
 }
 </script>
+
+<template>
+  <el-container :class="classObj">
+    <el-aside class="sidebar-container has-logo">
+      <Sidebar />
+    </el-aside>
+    <el-container>
+      <el-header class="fixed-header">
+        <div class="navbar">
+          <Header />
+        </div>
+        <TagsView />
+      </el-header>
+      <el-scrollbar>
+        <el-main class="container">
+          <router-view>
+            <template #default="{ Component, route }">
+              <transition name="fade-slide" mode="out-in" appear>
+                <keep-alive :include="cachedViews">
+                  <component :is="Component" :key="route.fullPath" />
+                </keep-alive>
+              </transition>
+            </template>
+          </router-view>
+        </el-main>
+      </el-scrollbar>
+    </el-container>
+  </el-container>
+</template>
+
 <style lang="scss">
 .container{
     min-height: calc(100vh - 84px);

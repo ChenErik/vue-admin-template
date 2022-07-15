@@ -8,7 +8,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antfu/eslint-config": "^0.25.2",
     "element-plus": "^2.1.4",
+    "file-saver": "^2.0.5",
+    "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "^6.2.0",
@@ -17,6 +20,8 @@
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.5",
+    "@types/mockjs": "^1.0.6",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
@@ -40,5 +45,8 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "eslintConfig": {
+    "extends": "@antfu"
   }
 }

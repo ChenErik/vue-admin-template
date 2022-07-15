@@ -1,46 +1,17 @@
-<template>
-  <div id="tags-view-container" class="tags-view-container" ref="tagsViewContainer">
-    <scroll-pane ref="scrollPane" class="tags-view-wrapper" @scroll="handleScroll">
-      <router-link
-        v-for="tag in visitedViews"
-        ref="tag"
-        :key="tag.path"
-        :class="isActive(tag)?'active':''"
-        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        tag="span"
-        class="tags-view-item"
-        @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
-        @contextmenu.prevent.native="openMenu(tag,$event)"
-      >
-        {{ tag.title }}
-        <el-icon v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" :size="10">
-          <Close />
-        </el-icon>
-      </router-link>
-    </scroll-pane>
-    <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
-      <li @click="refreshSelectedTag(selectedTag)">刷新页面</li>
-      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">关闭</li>
-      <li @click="closeOthersTags">关闭其他</li>
-      <li @click="closeAllTags(selectedTag)">全部关闭</li>
-    </ul>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { Close } from '@element-plus/icons-vue'
-import { ref,provide,watch,nextTick,onMounted,computed } from 'vue'
-import { useRoute,useRouter } from 'vue-router'
-import ScrollPane from './ScrollPane.vue'
+import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import path from 'path-browserify'
+import type { RoutesType, TagType } from 'types'
+import ScrollPane from './ScrollPane.vue'
 import { usePermissionStore } from '@/store/permission'
 import { useTagsViewStore } from '@/store/tagsView'
-import { RoutesType, TagType } from 'types'
 const $route = useRoute()
 const $router = useRouter()
 const routes = usePermissionStore().routes
 const tagsViewStore = useTagsViewStore()
-const visitedViews = computed(()=>tagsViewStore.getTabList)
+const visitedViews = computed(() => tagsViewStore.getTabList)
 const tagsViewContainer = ref<any>(null)
 const scrollPane = ref<any>(null)
 provide('parentTag', () => tagsViewContainer.value)
@@ -49,59 +20,57 @@ const top = ref<number>(0)
 const left = ref<number>(0)
 const selectedTag = ref<object>({})
 const affixTags = ref<[]>([])
-const isActive = (route:RoutesType):boolean => {
+const isActive = (route: RoutesType): boolean => {
   return route.path === $route.path
 }
-const isAffix = (tag:any):boolean => {
+const isAffix = (tag: any): boolean => {
   return tag.meta && tag.meta.affix
 }
-const filterAffixTags = (routes:RoutesType[],basePath:string = '/'):any => {
-  let tags:TagType[] = []
-  routes.forEach(route=>{
+const filterAffixTags = (routes: RoutesType[], basePath = '/'): any => {
+  let tags: TagType[] = []
+  routes.forEach((route) => {
     if (route.meta && route.meta.affix) {
       const tagPath = path.resolve(basePath, route.path)
       tags.push({
         fullPath: tagPath,
         path: tagPath,
         name: route.name,
-        meta: { ...route.meta }
+        meta: { ...route.meta },
       })
     }
     if (route.children) {
       const tempTags = filterAffixTags(route.children, route.path)
-      if (tempTags.length >= 1) {
+      if (tempTags.length >= 1)
         tags = [...tags, ...tempTags]
-      }
     }
   })
   return tags
 }
-const initTags = ():void => {
+const initTags = (): void => {
   const at = affixTags.value = filterAffixTags(routes)
-  for (let tag of at) {
+  for (const tag of at) {
     // Must have tag name
-    if (tag.name) {
+    if (tag.name)
       tagsViewStore.addVisitedView(tag)
-    }
   }
 }
-const addTags = ():boolean => {
+const addTags = (): boolean => {
   const { name } = $route
-  if (name) {
+  if (name)
     tagsViewStore.addView($route)
-  }
+
   return false
 }
 const moveToCurrentTag = () => {
-  let tags = tagsViewContainer.value.__vueParentComponent.ctx.$refs.tag
+  const tags = tagsViewContainer.value.__vueParentComponent.ctx.$refs.tag
   nextTick(() => {
-    for (let tag of tags) {
+    for (const tag of tags) {
       if (tag.to.path === $route.path) {
         scrollPane.value.moveToTarget(tag)
         // when query is different then update
-        if (tag.to.fullPath !== $route.fullPath) {
+        if (tag.to.fullPath !== $route.fullPath)
           tagsViewStore.updateVisitedView($route)
-        }
+
         break
       }
     }
@@ -113,80 +82,115 @@ const closeMenu = () => {
 const handleScroll = () => {
   closeMenu()
 }
-const refreshSelectedTag = async(view:any)=>{
+const refreshSelectedTag = async (view: any) => {
   await tagsViewStore.delCachedView(view)
   const { fullPath } = view
   await nextTick()
   $router.replace({
-    path: '/redirect' + fullPath
+    path: `/redirect${fullPath}`,
   })
 }
-const closeSelectedTag = async(view:any):Promise<void> => {
-  const { visitedViews }  = await tagsViewStore.delView(view)
-  if (isActive(view)) {
-    toLastView(visitedViews, view)
-  }
-}
-const closeOthersTags = async():Promise<void> => {
-  $router.push(selectedTag.value)
-  await tagsViewStore.delAllViews(selectedTag.value)
-  moveToCurrentTag()
-}
-const closeAllTags = async(view:any):Promise<void> => {
-  const { visitedViews } = await tagsViewStore.delAllViews()
-  if (affixTags.value.some((tag:TagType) => tag.path === view.path)) {
-    return
-  }
-  toLastView(visitedViews, view)
-}
-const toLastView = (visitedView:TagType[],view:TagType):void => {
+const toLastView = (visitedView: TagType[], view: TagType): void => {
   const latestView = visitedView.slice(-1)[0]
   if (latestView) {
     $router.push(latestView.fullPath)
-  } else {
+  }
+  else {
     // now the default is to redirect to the home page if there is no tags-view,
     // you can adjust it according to your needs.
     if (view.name === 'Dashboard') {
       // to reload home page
-      $router.replace({ path: '/redirect' + view.fullPath })
-    } else {
+      $router.replace({ path: `/redirect${view.fullPath}` })
+    }
+    else {
       $router.push('/')
     }
   }
 }
-const openMenu = (tag:TagType,e:MouseEvent):void => {
+const closeSelectedTag = async (view: any): Promise<void> => {
+  const { visitedViews } = await tagsViewStore.delView(view)
+  if (isActive(view))
+    toLastView(visitedViews, view)
+}
+const closeOthersTags = async (): Promise<void> => {
+  $router.push(selectedTag.value)
+  await tagsViewStore.delAllViews(selectedTag.value)
+  moveToCurrentTag()
+}
+const closeAllTags = async (view: any): Promise<void> => {
+  const { visitedViews } = await tagsViewStore.delAllViews()
+  if (affixTags.value.some((tag: TagType) => tag.path === view.path))
+    return
+
+  toLastView(visitedViews, view)
+}
+const openMenu = (tag: TagType, e: MouseEvent): void => {
   const menuMinWidth = 105
   const offsetLeft = tagsViewContainer.value.getBoundingClientRect().left // container margin left
   const offsetWidth = tagsViewContainer.value.offsetWidth // container width
   const maxLeft = offsetWidth - menuMinWidth // left boundary
   const mleft = e.clientX - offsetLeft + 15 // 15: margin right
 
-  if (mleft > maxLeft) {
+  if (mleft > maxLeft)
     left.value = maxLeft
-  } else {
+  else
     left.value = mleft
-  }
 
   top.value = e.clientY
   visible.value = true
   selectedTag.value = tag
 }
-watch($route,()=>{
+watch($route, () => {
   addTags()
   moveToCurrentTag()
 })
-watch(visible,(value)=>{
-  if (value) {
-    document.body.addEventListener('click',closeMenu)
-  } else {
+watch(visible, (value) => {
+  if (value)
+    document.body.addEventListener('click', closeMenu)
+  else
     document.body.removeEventListener('click', closeMenu)
-  }
 })
 onMounted(() => {
   initTags()
   addTags()
 })
 </script>
+
+<template>
+  <div id="tags-view-container" ref="tagsViewContainer" class="tags-view-container">
+    <scroll-pane ref="scrollPane" class="tags-view-wrapper" @scroll="handleScroll">
+      <router-link
+        v-for="tag in visitedViews"
+        ref="tag"
+        :key="tag.path"
+        :class="isActive(tag) ? 'active' : ''"
+        :to="{ path: tag.path, query: tag.query }"
+        class="tags-view-item"
+        @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
+        @contextmenu.prevent="openMenu(tag, $event)"
+      >
+        {{ tag.title }}
+        <el-icon v-if="!isAffix(tag)" class="el-icon-close" :size="10" @click.prevent.stop="closeSelectedTag(tag)">
+          <Close />
+        </el-icon>
+      </router-link>
+    </scroll-pane>
+    <ul v-show="visible" :style="{ left: `${left}px`, top: `${top}px` }" class="contextmenu">
+      <li @click="refreshSelectedTag(selectedTag)">
+        刷新页面
+      </li>
+      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">
+        关闭
+      </li>
+      <li @click="closeOthersTags">
+        关闭其他
+      </li>
+      <li @click="closeAllTags(selectedTag)">
+        全部关闭
+      </li>
+    </ul>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .tags-view-container {

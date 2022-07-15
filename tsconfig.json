@@ -16,7 +16,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "typeRoots": ["types","./node_modules/@types/"],
+    "typeRoots": ["./node_modules/@types/","types"],
     "skipLibCheck": true
   },
   "include": [
