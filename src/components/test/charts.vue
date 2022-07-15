@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, watch } from 'vue'
 import HmiChars from '../../packages/charts/src/Echarts'
 const props = defineProps({
@@ -76,4 +76,4 @@ watch(() => props.realTimeData, (n) => {
 
 <template>
   <HmiChars :echars-option="option" />
-</template>
+</template> -->

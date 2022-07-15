@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<!-- <script lang="ts" setup>
 import { markRaw, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import useEchartSize from './resize'
@@ -41,4 +41,4 @@ export default {
 
 <template>
   <div ref="chartRef" :style="{ width, height }" />
-</template>
+</template> -->

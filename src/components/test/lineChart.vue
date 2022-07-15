@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref } from 'vue'
 import charts from './charts'
 const datas = ref([])
@@ -25,4 +25,4 @@ setInterval(() => {
     grid-template-columns: repeat(3,1fr);
     grid-template-rows: 300px 300px;
 }
-</style>
+</style> -->
